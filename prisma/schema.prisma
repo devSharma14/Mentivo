@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ENUMS 
+
+enum Role {
+  USER
+  MENTOR
+}
+
+enum MeetingStatus {
+  PENDING
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+// MODELS
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // one user can have one mentor profile
+  mentorProfile MentorProfile?
+
+  // meetings this user has requested
+  sentRequests  MeetingRequest[]  @relation("Requester")
+
+  // reviews this user has written
+  reviewsGiven  Review[]          @relation("Reviewer")
+
+  // nextauth required tables
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model MentorProfile {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio           String
+  experience    String
+  expertise     String[]
+
+  linkedIn      String?
+  twitter       String?
+
+  isVerified    Boolean   @default(false)
+  isAvailable   Boolean   @default(true)
+
+  totalMeetings Int       @default(0)
+  averageRating Float?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // meetings received by this mentor
+  receivedRequests  MeetingRequest[]  @relation("MentorMeetings")
+}
+
+model MeetingRequest {
+  id            String        @id @default(cuid())
+
+  requesterId   String
+  requester     User          @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  mentorId      String
+  mentor        MentorProfile @relation("MentorMeetings", fields: [mentorId], references: [id], onDelete: Cascade)
+
+  status        MeetingStatus @default(PENDING)
+
+  calEventId    String?
+  meetingLink   String?
+  scheduledAt   DateTime?
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // one meeting can have one review
+  review        Review?
+}
+
+model Review {
+  id            String   @id @default(cuid())
+
+  meetingId     String   @unique
+  meeting       MeetingRequest  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  reviewerId    String
+  reviewer      User     @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  rating        Int      // 1 to 5
+  comment       String?
+
+  createdAt     DateTime @default(now())
+}
+
+// NEXTAUTH REQUIRED
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
