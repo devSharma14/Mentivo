@@ -27,7 +27,7 @@ export default function Navbar() {
       </Link>
 
       {/* Center Links */}
-      <div className="hidden md:flex items-center gap-8 text-base text-neutral-300">
+      <div className="hidden md:flex items-center gap-8 text-base md:text-xl text-neutral-300">
         <Link href="/mentors" className="hover:text-white transition">
           Browse Mentors
         </Link>
