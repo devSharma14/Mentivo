@@ -15,7 +15,7 @@ export default function Hero() {
 
                     {/* Badge */}
                     <div className="mb-6">
-                        <span className="text-[10px] md:text-xs tracking-wider uppercase bg-white/5 border border-white/10 px-3 md:px-4 py-1.5 rounded-full text-neutral-300">
+                        <span className="text-[10px] md:text-base tracking-wider uppercase bg-white/5 border border-white/10 px-3 md:px-4 py-1.5 rounded-full text-neutral-300">
                             1:1 Mentorship Platform
                         </span>
                     </div>

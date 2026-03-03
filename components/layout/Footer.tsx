@@ -12,7 +12,7 @@ export default function Footer() {
         </div>
 
         {/* Center - Copyright */}
-        <div className="absolute left-1/2 -translate-x-1/2 text-white/50 text-sm">
+        <div className="absolute left-1/2 -translate-x-1/2 text-white/50 text-sm md:text-xl">
           © 2026 Mentivo. All rights reserved.
         </div>
 
